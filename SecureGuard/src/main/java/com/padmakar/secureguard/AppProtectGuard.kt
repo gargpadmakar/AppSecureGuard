@@ -1,3 +1,5 @@
+package com.padmakar.secureguard
+
 object AppProtectGuard {
 
     init {
