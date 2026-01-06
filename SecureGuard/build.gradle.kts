@@ -10,6 +10,8 @@ android {
 
     defaultConfig {
         minSdk = 24
+
+        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles("consumer-rules.pro")
 
         externalNativeBuild {
@@ -49,19 +51,36 @@ android {
     }
 }
 
-/**
- * ✅ CORRECT PUBLISH CONFIG (JitPack Safe)
- */
 afterEvaluate {
     publishing {
         publications {
-            create<MavenPublication>("release") {
+            create<MavenPublication>("maven") {
                 groupId = "com.github.gargpadmakar"
                 artifactId = "AppSecureGuard"
+                version = "1.1.1"
 
-                // 🔥 Let Gradle decide correct AAR & version (from tag)
-                from(components["release"])
+                // AAR file as artifact
+                artifact("$buildDir/outputs/aar/SecureGuard-release.aar")
             }
         }
+
+        // Publish the artifacts to Maven Local
+        repositories {
+            mavenLocal()
+        }
     }
+
+    // Make sure the publish task depends on the AAR bundling task
+    tasks.named("publishMavenPublicationToMavenLocal").configure {
+        dependsOn(tasks.named("bundleReleaseAar"))
+    }
+}
+dependencies {
+
+    implementation(libs.androidx.core.ktx)
+    implementation(libs.androidx.appcompat)
+    implementation(libs.material)
+    testImplementation(libs.junit)
+    androidTestImplementation(libs.androidx.junit)
+    androidTestImplementation(libs.androidx.espresso.core)
 }
