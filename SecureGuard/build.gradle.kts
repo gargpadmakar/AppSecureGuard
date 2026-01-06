@@ -55,7 +55,7 @@ afterEvaluate {
     publishing {
         publications {
             create<MavenPublication>("maven") {
-                groupId = "com.github.padmakar1811"
+                groupId = "com.github.gargpadmakar"
                 artifactId = "AppSecureGuard"
                 version = "1.1.0"
 
