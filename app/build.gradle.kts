@@ -45,5 +45,7 @@ dependencies {
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
-    implementation(project(":SecureGuard"))
+    implementation("com.github.gargpadmakar:AppSecureGuard:1.1.0")
+
+  //  implementation(project(":SecureGuard"))
 }

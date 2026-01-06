@@ -1,6 +1,6 @@
 jdk:
   - openjdk17
+build:
+  commands:
+    - ./gradlew clean :SecureGuard:assembleRelease
 
-before_install:
-  - chmod +x ./scripts/prepareJitpackEnvironment.sh
-  - ./scripts/prepareJitpackEnvironment.sh
