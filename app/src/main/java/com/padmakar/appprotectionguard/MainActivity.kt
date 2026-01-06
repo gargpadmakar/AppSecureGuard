@@ -6,7 +6,7 @@ import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
-import com.padmakar.secureguard.AppProtectGuard
+
 
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -18,8 +18,13 @@ class MainActivity : AppCompatActivity() {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
-        if(AppProtectGuard.isDeviceRootedOrEmulator(this)){
-            Log.e("App Security Status -- ","---Secure")
+        // ⚠️ Optional soft checks
+        if (AppProtectGuard.nativeShouldShowSecurityAlert()) {
+            Log.e("Security", "Risky environment")
+        }
+
+        if (AppProtectGuard.nativeIsHookDetected()) {
+            Log.e("Security", "Hook detected")
         }
     }
 }
