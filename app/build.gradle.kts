@@ -5,12 +5,12 @@ plugins {
 
 android {
     namespace = "com.padmakar.appprotectionguard"
-    compileSdk = 35
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "com.padmakar.appprotectionguard"
         minSdk = 24
-        targetSdk = 34
+        targetSdk = 36
         versionCode = 1
         versionName = "1.0"
 
@@ -45,7 +45,5 @@ dependencies {
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
-    implementation("com.github.padmakar1811:AppSecureGuard:1.1.0")
-
-    // implementation(project(":SecureGuard"))
+    implementation(project(":SecureGuard"))
 }
