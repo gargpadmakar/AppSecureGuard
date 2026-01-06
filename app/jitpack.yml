@@ -1,6 +1,7 @@
 jdk:
   - openjdk17
-build:
-  commands:
-    - ./gradlew clean :SecureGuard:assembleRelease
+
+install:
+  - ./gradlew :SecureGuard:publishToMavenLocal
+
 
