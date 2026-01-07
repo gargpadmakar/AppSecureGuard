@@ -1,36 +1,56 @@
+# 🛡️ AppProtectGuard
+
+[![](https://jitpack.io/v/padmakar1811/AppSecureGuard.svg)](https://jitpack.io/#padmakar1811/AppSecureGuard)
+![Platform](https://img.shields.io/badge/platform-Android-green)
+![Language](https://img.shields.io/badge/language-Java%20%7C%20Kotlin%20%7C%20JNI-blue)
+![Security](https://img.shields.io/badge/focus-Mobile%20Security-red)
+
+**AppProtectGuard** is an Android security library that detects **compromised, tampered, or hostile runtime environments**.  
+It uses a **native (JNI) security core** to significantly increase resistance against reverse engineering, hooking, and runtime bypass techniques.
+
+> Designed for **banking, fintech, enterprise, DRM, and high-security Android applications**.
+
 ---
 
-# AppProtectGuard
+## ✨ Features
 
-**AppProtectGuard** is a security library designed for Android applications to help detect various types of vulnerabilities and unauthorized modifications. It can detect rooted devices, emulators, active debuggers, VPN usage, proxy settings, and more. The library ensures that your app runs in a secure environment and provides protection against tampering.
+### 🔐 Device & System Integrity
+- Root detection (`su`, Magisk, Zygisk)
+- Test-keys (non-production Android builds)
+- USB debugging detection
 
-## Features
+### 📱 Emulator Detection
+- Android Emulator (AVD / QEMU)
+- Genymotion, BlueStacks, Nox, LDPlayer, MEmu
+- Hypervisor / VirtualBox detection
 
-- **Root Detection**: Detects if the device is rooted using multiple methods.
-- **Emulator Detection**: Identifies whether the device is running on an emulator.
-- **Debugger Detection**: Checks if a debugger is attached to the app.
-- **Frida Injection Detection**: Detects the presence of Frida (a dynamic instrumentation toolkit).
-- **VPN Detection**: Detects if the device is connected to a VPN.
-- **Proxy Detection**: Detects the usage of HTTP proxy.
-- **Developer Options Detection**: Identifies if developer options or USB debugging are enabled.
--  **Native (JNI) Security Checks**  
-  Critical security checks are implemented in native C/C++ code to improve resistance against reverse engineering and runtime bypass.
+### 🧪 Runtime Instrumentation Detection
+- Debugger detection (ptrace + `/proc`)
+- Frida detection (memory maps, gum artifacts)
+- Xposed / LSPosed / EdXposed / Riru detection
 
+### 🌐 Network & MITM Protection
+- HTTP / HTTPS proxy detection
+- MITM interception ports (8080, 8888, 9090)
+- Environment proxy variables detection
 
-## Installation
+### 🧬 Native (JNI) Security Core
+- Core checks implemented in C (JNI)
+- Reduced Java-level attack surface
+- Hard-kill enforcement for high-risk environments
 
-To include **AppProtectGuard** in your project, follow the steps below:
+---
 
-### Step 1: Add JitPack Repository
+## 📦 Installation
 
-In your `root build.gradle` file, add the JitPack repository:
+### 1️⃣ Add JitPack Repository
 
+**`settings.gradle` or root `build.gradle`**
 ```gradle
-allprojects {
-    repositories {
-        maven { url 'https://jitpack.io' }
-    }
+repositories {
+    maven { url "https://jitpack.io" }
 }
+
 ```
 
 ### Step 2: Add Dependency
