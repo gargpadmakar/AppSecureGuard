@@ -57,7 +57,7 @@ afterEvaluate {
             create<MavenPublication>("maven") {
                 groupId = "com.github.gargpadmakar"
                 artifactId = "AppSecureGuard"
-                version = "1.1.1"
+                version = "1.0.0"
 
                 // AAR file as artifact
                 artifact("$buildDir/outputs/aar/SecureGuard-release.aar")
