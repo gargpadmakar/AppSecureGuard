@@ -4,6 +4,7 @@
 ![Platform](https://img.shields.io/badge/platform-Android-green)
 ![Language](https://img.shields.io/badge/language-Java%20%7C%20Kotlin%20%7C%20JNI-blue)
 ![Security](https://img.shields.io/badge/focus-Mobile%20Security-red)
+![Version](https://img.shields.io/badge/version-v1.0.1-brightgreen)
 
 **AppProtectGuard** is an Android security library that detects **compromised, tampered, or hostile runtime environments**.  
 It uses a **native (JNI) security core** to significantly increase resistance against reverse engineering, hooking, and runtime bypass techniques.
