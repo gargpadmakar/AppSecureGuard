@@ -75,16 +75,15 @@ To use **AppProtectGuard**, you can call the `isDeviceRootedOrEmulator` function
 ### Example
 
 ```kotlin
-import com.locateme.utils.AppProtectGuardApp
+import com.padmakar.appprotectionguard
 
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-       if (AppProtectGuard.nativeShouldShowSecurityAlert()) {
-            Log.e("Security", "Risky environment")
-        }
+        // 🔐 Soft-mode BottomSheet alert
+        AppProtectGuard.showSecurityAlertIfNeeded(this)
     }
 }
 ```
