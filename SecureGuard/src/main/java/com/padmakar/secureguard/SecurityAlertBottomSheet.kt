@@ -25,47 +25,21 @@ internal class SecurityAlertBottomSheet : BottomSheetDialogFragment() {
         val tvMessage = view.findViewById<TextView>(R.id.tvMessage)
         val btnOk = view.findViewById<Button>(R.id.btnOk)
 
-        val issues = mutableListOf<String>()
+        val header = AppProtectGuard.getSecurityHeader()
+        val issues = AppProtectGuard.getRiskMessages()
+        val footer = AppProtectGuard.getSecurityFooter()
 
-        // 🔍 Individual signals
-        val isHook = AppProtectGuard.isHookDetectedInternal()
-        val isNetwork = AppProtectGuard.isNetworkBlocked()
-        val isGenericRisk = AppProtectGuard.shouldShowSecurityAlert()
-
-        /*
-         * ✅ SHOW ONLY RELEVANT ISSUES
-         */
-
-        // 1️⃣ Hooking / instrumentation
-        if (isHook) {
-            issues.add("• Debugger / Frida / hooking framework detected")
-        }
-
-        // 2️⃣ Network / MITM
-        if (isNetwork) {
-            issues.add("• Proxy / VPN / MITM network configuration detected")
-        }
-
-        // 3️⃣ Device integrity (ONLY if no hook & no network)
-        if (issues.isEmpty() && isGenericRisk) {
-            issues.add("• Device integrity issue detected (root / emulator / modified OS)")
-        }
-
-        // 🛡️ Safety fallback
-        if (issues.isEmpty()) {
-            issues.add("• Suspicious environment detected")
-        }
-
-        // 📝 UI
         tvMessage.text = buildString {
-            append("Security risks detected on this device:\n\n")
+            append(header)
             issues.forEach { append(it).append("\n") }
-            append("\nSome features may be limited to protect your data.")
+            append(footer)
         }
 
-        btnOk.setOnClickListener { dismiss() }
-        isCancelable = false
+        btnOk.setOnClickListener {
+            AppProtectGuard.forceExit()
+        }
 
+        isCancelable = false
         return view
     }
 }

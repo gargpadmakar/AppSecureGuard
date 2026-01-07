@@ -23,26 +23,32 @@ object AppProtectGuard {
     }
 
     // =================================================
+    // 🧩 RISK MASK FLAGS (MUST MATCH guard.c)
+    // =================================================
+    const val RISK_DEV_OPTIONS = 1 shl 0
+    const val RISK_HOOK        = 1 shl 1
+    const val RISK_NETWORK     = 1 shl 2
+    const val RISK_INTEGRITY   = 1 shl 3
+
+    // =================================================
     // 🔥 HARD MODE (Enterprise / Banking)
     // =================================================
-    // MUST be called early (Application / Splash)
     @JvmStatic
     fun enforce(context: Context) {
         var javaRiskScore = 0
 
-        // 🔐 Native hook / instrumentation check
+        // High-severity native signal
         if (nativeIsHookDetected()) {
             javaRiskScore += 3
         }
 
-        // 🔥 Native decides final enforcement
+        // Native decides final enforcement
         nativeVerifyAndEnforce(javaRiskScore)
     }
 
     // =================================================
     // 🔔 SOFT MODE (Play Store safe)
     // =================================================
-    // BottomSheet based alert – NO finish(), NO kill
     @JvmStatic
     fun showSecurityAlertIfNeeded(activity: FragmentActivity) {
         if (shouldShowSecurityAlert()) {
@@ -52,7 +58,7 @@ object AppProtectGuard {
     }
 
     // =================================================
-    // 🔔 POPUP SIGNAL (PURE NATIVE)
+    // 🔔 GENERIC NATIVE SIGNAL
     // =================================================
     private external fun nativeShouldShowSecurityAlert(): Boolean
 
@@ -62,47 +68,73 @@ object AppProtectGuard {
     }
 
     // =================================================
-    // 🌐 NETWORK / FAKE RESPONSE SUPPORT
+    // 🌐 NETWORK / MITM
     // =================================================
+    private external fun nativeIsNetworkBlocked(): Boolean
+
     @JvmStatic
     fun isNetworkBlocked(): Boolean {
         return nativeIsNetworkBlocked()
     }
 
     @JvmStatic
-    fun shouldUseFakeResponse(): Boolean {
-        return isNetworkBlocked()
-    }
+    fun shouldUseFakeResponse(): Boolean = isNetworkBlocked()
 
     @JvmStatic
-    fun getFakeApiResponse(): String {
-        return nativeFakeApiResponse()
+    fun getFakeApiResponse(): String = nativeFakeApiResponse()
+
+    // =================================================
+    // 🔴 HIGH-SEVERITY: HOOK / DEBUGGER
+    // =================================================
+    private external fun nativeIsHookDetected(): Boolean
+
+    /**
+     * INTERNAL (UI only)
+     * Used by BottomSheet if needed
+     */
+    internal fun isHookDetectedInternal(): Boolean {
+        return nativeIsHookDetected()
     }
 
     // =================================================
-    // 🔥 JNI BRIDGE (PRIVATE)
+    // 🧠 NATIVE RISK MASK (UI MAPPING)
+    // =================================================
+    private external fun nativeGetRiskMask(): Int
+
+    /**
+     * Returns native-calculated risk bitmask
+     * Used ONLY for UI messaging
+     */
+    @JvmStatic
+    fun getRiskMask(): Int {
+        return nativeGetRiskMask()
+    }
+    private external fun nativeGetRiskMessages(): Array<String>
+
+    @JvmStatic
+    fun getRiskMessages(): List<String> {
+        return nativeGetRiskMessages().toList()
+    }
+
+    // Header & footer from native
+    private external fun nativeGetSecurityHeader(): String
+    private external fun nativeGetSecurityFooter(): String
+
+    @JvmStatic
+    fun getSecurityHeader(): String = nativeGetSecurityHeader()
+
+    @JvmStatic
+    fun getSecurityFooter(): String = nativeGetSecurityFooter()
+
+    // =================================================
+    // 🔥 JNI CORE
     // =================================================
     private external fun nativeVerifyAndEnforce(javaRiskScore: Int)
-    private external fun nativeIsHookDetected(): Boolean
-    private external fun nativeIsNetworkBlocked(): Boolean
     private external fun nativeFakeApiResponse(): String
 
     // =================================================
-    // ❌ FORCE EXIT (Optional – Java triggered)
+    // ❌ FORCE EXIT (SIGKILL)
     // =================================================
     @JvmStatic
     external fun forceExit()
-
-    // INTERNAL use for UI only
-    internal fun isHookDetectedInternal(): Boolean {
-        return try {
-            val m = AppProtectGuard::class.java
-                .getDeclaredMethod("nativeIsHookDetected")
-            m.isAccessible = true
-            m.invoke(null) as Boolean
-        } catch (e: Throwable) {
-            false
-        }
-    }
-
 }

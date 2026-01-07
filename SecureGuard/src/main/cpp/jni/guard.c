@@ -22,7 +22,8 @@
 
 /* --------------------------------------------------
  * Internal headers (MODULARIZED)
- * -------------------------------------------------- */
+ * --------------------------------------------------
+ * */
 #include "../core/anti_debug.h"
 
 #include "../security/root_check.h"
@@ -31,6 +32,17 @@
 #include "../security/xposed_check.h"
 #include "../security/frida_check.h"
 #include "../security/mitm_check.h"
+
+
+/* --------------------------------------------------
+ * RISK MASK FLAGS (UI MAPPING)
+ * -------------------------------------------------- */
+#define RISK_DEV_OPTIONS   (1 << 0)
+#define RISK_HOOK          (1 << 1)
+#define RISK_NETWORK       (1 << 2)
+#define RISK_INTEGRITY     (1 << 3)
+
+
 
 /* --------------------------------------------------
  * GLOBAL STATE
@@ -173,6 +185,41 @@ Java_com_padmakar_secureguard_AppProtectGuard_forceExit(
     kill(getpid(), SIGKILL);
     _exit(0);
 }
+/* ==================================================
+ * JNI: Get risk mask (UI mapping only)
+ * --------------------------------------------------
+ * - NO enforcement
+ * - NO killing
+ * - Used only for UI messaging
+ * ================================================== */
+JNIEXPORT jint JNICALL
+Java_com_padmakar_secureguard_AppProtectGuard_nativeGetRiskMask(
+        JNIEnv *env, jclass clazz) {
+
+    int mask = 0;
+
+    /* -------- Low severity -------- */
+    if (detect_usb_debugging() || detect_test_keys()) {
+        mask |= RISK_DEV_OPTIONS;
+    }
+
+    /* -------- Hook / instrumentation -------- */
+    if (detect_frida() || detect_xposed() || is_debugger_present()) {
+        mask |= RISK_HOOK;
+    }
+
+    /* -------- Network tampering -------- */
+    if (detect_proxy_env() || detect_mitm_ports()) {
+        mask |= RISK_NETWORK;
+    }
+
+    /* -------- Device integrity -------- */
+    if (detect_su_binary() || detect_emulator() || detect_magisk()) {
+        mask |= RISK_INTEGRITY;
+    }
+
+    return mask;
+}
 
 /* ==================================================
  * JNI_OnLoad
@@ -189,4 +236,66 @@ JNI_OnLoad(JavaVM *vm, void *reserved) {
     init_ptrace();
 
     return JNI_VERSION_1_6;
+}
+/* ==================================================
+ * JNI: Get risk messages (UI ONLY)
+ * ================================================== */
+JNIEXPORT jobjectArray JNICALL
+Java_com_padmakar_secureguard_AppProtectGuard_nativeGetRiskMessages(
+        JNIEnv *env, jclass clazz) {
+
+    const char *messages[5];
+    int count = 0;
+
+    if (detect_frida() || detect_xposed() || is_debugger_present()) {
+        messages[count++] = "• Debugging or hooking tools detected";
+    }
+
+    if (detect_proxy_env() || detect_mitm_ports()) {
+        messages[count++] = "• Proxy, VPN, or network interception detected";
+    }
+
+    if (detect_usb_debugging() || detect_test_keys()) {
+        messages[count++] = "• Developer options or USB debugging is enabled";
+    }
+
+    if (detect_su_binary() || detect_emulator() || detect_magisk()) {
+        messages[count++] = "• Device integrity issue detected";
+    }
+
+    if (count == 0) {
+        messages[count++] = "• Suspicious environment detected";
+    }
+
+    jclass stringClass = (*env)->FindClass(env, "java/lang/String");
+    jobjectArray array = (*env)->NewObjectArray(env, count, stringClass, NULL);
+
+    for (int i = 0; i < count; i++) {
+        (*env)->SetObjectArrayElement(
+                env,
+                array,
+                i,
+                (*env)->NewStringUTF(env, messages[i])
+        );
+    }
+
+    return array;
+}
+JNIEXPORT jstring JNICALL
+Java_com_padmakar_secureguard_AppProtectGuard_nativeGetSecurityHeader(
+        JNIEnv *env, jclass clazz) {
+
+    return (*env)->NewStringUTF(
+            env,
+            "Security notice:\n\n"
+    );
+}
+JNIEXPORT jstring JNICALL
+Java_com_padmakar_secureguard_AppProtectGuard_nativeGetSecurityFooter(
+        JNIEnv *env, jclass clazz) {
+
+    return (*env)->NewStringUTF(
+            env,
+            "\nThe application will close to protect your data."
+    );
 }
