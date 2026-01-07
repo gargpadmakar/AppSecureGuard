@@ -19,13 +19,9 @@ class MainActivity : AppCompatActivity() {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
-        // ⚠️ Optional soft checks
-        if (AppProtectGuard.nativeShouldShowSecurityAlert()) {
-            Log.e("Security", "Risky environment")
-        }
 
-        if (AppProtectGuard.nativeIsHookDetected()) {
-            Log.e("Security", "Hook detected")
-        }
+        // 🔐 Soft-mode BottomSheet alert
+        AppProtectGuard.showSecurityAlertIfNeeded(this)
+
     }
 }
