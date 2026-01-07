@@ -13,6 +13,9 @@
 - **VPN Detection**: Detects if the device is connected to a VPN.
 - **Proxy Detection**: Detects the usage of HTTP proxy.
 - **Developer Options Detection**: Identifies if developer options or USB debugging are enabled.
+-  **Native (JNI) Security Checks**  
+  Critical security checks are implemented in native C/C++ code to improve resistance against reverse engineering and runtime bypass.
+
 
 ## Installation
 
@@ -36,7 +39,7 @@ In your module's `build.gradle` file, add the following dependency:
 
 ```gradle
 dependencies {
-    implementation 'com.github.padmakar1811:AppSecureGuard:v1.0.0-alpha'
+    implementation 'com.github.padmakar1811:AppSecureGuard:v1.0.1'
 }
 ```
 
@@ -58,15 +61,8 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        // Check if the device is rooted or running in an emulator
-        val isDeviceSecure = AppProtectGuardApp.isDeviceRootedOrEmulator(applicationContext)
-        
-        if (isDeviceSecure) {
-            // Handle insecure device scenario
-            Toast.makeText(this, "Insecure device detected", Toast.LENGTH_SHORT).show()
-        } else {
-            // Proceed with normal app functionality
-            Toast.makeText(this, "Device is secure", Toast.LENGTH_SHORT).show()
+       if (AppProtectGuard.nativeShouldShowSecurityAlert()) {
+            Log.e("Security", "Risky environment")
         }
     }
 }
